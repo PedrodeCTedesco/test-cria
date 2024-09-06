@@ -6,37 +6,313 @@ import {
   Patch,
   Param,
   Delete,
+  ValidationPipe,
+  UsePipes,
+  InternalServerErrorException,
+  Logger,
+  NotFoundException,
+  BadRequestException,
+  ConflictException,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { User } from './schema/user.schema';
+import {
+  ApiBody,
+  ApiOperation,
+  ApiParam,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 
+@ApiTags('users')
 @Controller('users')
 export class UsersController {
+  private readonly logger = new Logger(UsersController.name);
+
   constructor(private readonly usersService: UsersService) {}
 
+  @ApiOperation({
+    summary: 'Registro de um novo usuário no banco',
+  })
+  @ApiResponse({
+    status: 201,
+    description: 'Usuário criado e registrado com sucesso',
+  })
+  @ApiResponse({
+    status: 400,
+    description:
+      'Ausência de propriedade e/ou valor inválido no payload de criação de novo usuário',
+  })
+  @ApiResponse({
+    status: 409,
+    description: 'Usuário já existe com esse nome de usuário',
+  })
+  @ApiResponse({
+    status: 500,
+    description: 'Erro interno do servidor ao criar novo usuário',
+  })
   @Post()
-  create(@Body() createUserDto: CreateUserDto) {
-    return this.usersService.create(createUserDto);
+  @UsePipes(new ValidationPipe({ whitelist: true }))
+  async create(@Body(new ValidationPipe()) createUserDto: CreateUserDto) {
+    try {
+      const response = await this.usersService.findOneByUsername(
+        createUserDto.username,
+      );
+
+      if (!response) return await this.usersService.create(createUserDto);
+
+      throw new ConflictException({
+        type: process.env.API_DOCUMENTATION,
+        title: 'User Already Exists',
+        status: 409,
+        detail: `A user with the username ${createUserDto.username} already exists.`,
+        instance: '/users',
+      });
+    } catch (error) {
+      this.logger.error(
+        'An unexpected error occurred during user creation:',
+        error,
+      );
+      if (error instanceof InternalServerErrorException) {
+        throw error;
+      } else if (error instanceof BadRequestException) {
+        throw new InternalServerErrorException({
+          type: process.env.API_DOCUMENTATION,
+          title: 'Bad Request',
+          status: 400,
+          detail: 'Invalid input data',
+          instance: '/users',
+        });
+      } else if (error instanceof ConflictException) {
+        throw error; // Retornar o erro de conflito sem modificar
+      } else {
+        console.error('Unexpected error occurred during user creation:', error);
+        throw new InternalServerErrorException({
+          type: process.env.API_DOCUMENTATION,
+          title: 'Unexpected Internal Server Error',
+          status: 500,
+          detail: 'An unexpected error occurred during user creation',
+          instance: '/users',
+        });
+      }
+    }
   }
 
+  @ApiOperation({
+    summary: 'Retorna uma lista de todos os usuários registrados no banco',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Lista de usuários retornada com sucesso',
+    type: [User],
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Payload incompleto',
+  })
+  @ApiResponse({
+    status: 500,
+    description: 'Erro interno do servidor ao buscar os usuários',
+  })
   @Get()
-  findAll() {
-    return this.usersService.findAll();
+  async findAll(): Promise<User[]> {
+    try {
+      const response = await this.usersService.findAll();
+      if (!response || !Array.isArray(response)) {
+        throw new InternalServerErrorException({
+          type: process.env.API_DOCUMENTATION,
+          title: 'Data type must be an array',
+          status: 500,
+          detail: 'The type of response data is not an array of users',
+          instance: '/users',
+        });
+      }
+
+      return response;
+    } catch (error: unknown) {
+      this.logger.error('An unexpected error occurred:', error);
+      if (error instanceof InternalServerErrorException) {
+        throw error;
+      } else {
+        // Caso contrário, lançamos uma nova InternalServerErrorException com a mensagem correta
+        console.error('Unexpected error occurred:', error);
+        throw new InternalServerErrorException({
+          type: 'uri',
+          title: 'Unexpected Internal Server Error',
+          status: 500,
+          detail: 'An unexpected error occurred',
+          instance: '/users',
+        });
+      }
+    }
   }
 
+  @ApiOperation({
+    summary: 'Retorna um usuário específico baseado no ID',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Usuário encontrado e retornado com sucesso',
+    type: User,
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Usuário não encontrado',
+  })
+  @ApiResponse({
+    status: 500,
+    description: 'Erro interno do servidor ao buscar o usuário',
+  })
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.usersService.findOne(+id);
+  async findOne(@Param('id') id: string): Promise<User> {
+    try {
+      const response: User = await this.usersService.findOne(+id);
+      if (!response) {
+        throw new NotFoundException({
+          type: process.env.API_DOCUMENTATION,
+          title: 'user not found',
+          status: 404,
+          detail: `Check the id because there is no user under the id ${id}`,
+          instance: '/users/:id',
+        });
+      }
+      return response;
+    } catch (error) {
+      this.logger.error('An unexpected error occurred:', error);
+      if (error instanceof NotFoundException) {
+        throw error;
+      } else {
+        // Caso contrário, lançamos uma nova InternalServerErrorException com a mensagem correta
+        console.error('Unexpected error occurred:', error);
+        throw new InternalServerErrorException({
+          type: process.env.API_DOCUMENTATION,
+          title: 'Unexpected Internal Server Error',
+          status: 500,
+          detail: 'An unexpected error occurred',
+          instance: '/users/:id',
+        });
+      }
+    }
   }
 
+  @ApiOperation({
+    summary: 'Atualiza um usuário específico baseado no ID',
+  })
+  @ApiBody({ type: UpdateUserDto })
+  @ApiParam({
+    name: 'id',
+    type: String,
+    description: 'ID do usuário a ser atualizado',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Usuário atualizado com sucesso',
+    type: User,
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Dados inválidos para atualização do usuário',
+  })
+  @ApiResponse({
+    status: 500,
+    description: 'Erro interno do servidor ao atualizar o usuário',
+  })
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.update(+id, updateUserDto);
+  async update(
+    @Param('id') id: string,
+    @Body() updateUserDto: UpdateUserDto,
+  ): Promise<User> {
+    try {
+      const response: User = await this.usersService.update(+id, updateUserDto);
+      if (!response) {
+        throw new NotFoundException({
+          type: process.env.API_DOCUMENTATION,
+          title: 'User not found',
+          status: 404,
+          detail: `Check the id because there is no user under the id ${id} to update`,
+          instance: '/users/:id',
+        });
+      }
+      return response;
+    } catch (error) {
+      this.logger.error(
+        'An unexpected error occurred during user update:',
+        error,
+      );
+      if (error instanceof NotFoundException) {
+        throw error;
+      } else {
+        this.logger.error(
+          'Unexpected error occurred during user update:',
+          error,
+        );
+        throw new InternalServerErrorException({
+          type: process.env.API_DOCUMENTATION,
+          title: 'Unexpected Internal Server Error',
+          status: 500,
+          detail: 'An unexpected error occurred during user update',
+          instance: '/users/:id',
+        });
+      }
+    }
   }
 
+  @ApiOperation({
+    summary: 'Remove um usuário específico baseado no ID',
+  })
+  @ApiParam({
+    name: 'id',
+    type: String,
+    description: 'ID do usuário a ser removido',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Usuário removido com sucesso',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Usuário não encontrado',
+  })
+  @ApiResponse({
+    status: 500,
+    description: 'Erro interno do servidor ao remover o usuário',
+  })
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.usersService.remove(+id);
+  async remove(@Param('id') id: string): Promise<void> {
+    try {
+      const result = await this.usersService.remove(id);
+      if (!result) {
+        throw new NotFoundException({
+          type: process.env.API_DOCUMENTATION,
+          title: 'User not found',
+          status: 404,
+          detail: `Check the id because there is no user under the id ${id} to delete`,
+          instance: `/users/${id}`,
+        });
+      }
+      return null;
+    } catch (error) {
+      this.logger.error(
+        'An unexpected error occurred during user deletion:',
+        error,
+      );
+      if (error instanceof NotFoundException) {
+        throw error;
+      } else {
+        this.logger.error(
+          'Unexpected error occurred during user deletion:',
+          error,
+        );
+        throw new InternalServerErrorException({
+          type: process.env.API_DOCUMENTATION,
+          title: 'Unexpected Internal Server Error',
+          status: 500,
+          detail: 'An unexpected error occurred during user deletion',
+          instance: `/users/${id}`,
+        });
+      }
+    }
   }
 }
