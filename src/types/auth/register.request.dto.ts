@@ -1,5 +1,4 @@
-export type SimpleUser = {
-  id?: string;
+export type RegisterRequestDto = {
   username: string;
   password: string;
 };

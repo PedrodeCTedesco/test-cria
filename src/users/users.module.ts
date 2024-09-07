@@ -12,5 +12,6 @@ import { ApiTags } from '@nestjs/swagger';
   ],
   controllers: [UsersController],
   providers: [UsersService],
+  exports: [UsersService],
 })
 export class UsersModule {}
