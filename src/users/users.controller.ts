@@ -55,13 +55,15 @@ export class UsersController {
   })
   @Post()
   @UsePipes(new ValidationPipe({ whitelist: true }))
-  async create(@Body(new ValidationPipe()) createUserDto: CreateUserDto) {
+  async create(
+    @Body(new ValidationPipe()) createUserDto: CreateUserDto,
+  ): Promise<User> {
     try {
-      const response = await this.usersService.findOneByUsername(
+      const user: User = await this.usersService.findOneByUsername(
         createUserDto.username,
       );
 
-      if (!response) return await this.usersService.create(createUserDto);
+      if (!user) return await this.usersService.create(createUserDto);
 
       throw new ConflictException({
         type: process.env.API_DOCUMENTATION,
@@ -103,6 +105,7 @@ export class UsersController {
   @ApiOperation({
     summary: 'Retorna uma lista de todos os usuários registrados no banco',
   })
+  @ApiBody({ type: CreateUserDto })
   @ApiResponse({
     status: 200,
     description: 'Lista de usuários retornada com sucesso',
@@ -119,8 +122,8 @@ export class UsersController {
   @Get()
   async findAll(): Promise<User[]> {
     try {
-      const response = await this.usersService.findAll();
-      if (!response || !Array.isArray(response)) {
+      const users: User[] = await this.usersService.findAll();
+      if (!users || !Array.isArray(users)) {
         throw new InternalServerErrorException({
           type: process.env.API_DOCUMENTATION,
           title: 'Data type must be an array',
@@ -130,7 +133,7 @@ export class UsersController {
         });
       }
 
-      return response;
+      return users;
     } catch (error: unknown) {
       this.logger.error('An unexpected error occurred:', error);
       if (error instanceof InternalServerErrorException) {
@@ -168,8 +171,8 @@ export class UsersController {
   @Get(':id')
   async findOne(@Param('id') id: string): Promise<User> {
     try {
-      const response: User = await this.usersService.findOne(+id);
-      if (!response) {
+      const user: User = await this.usersService.findOne(+id);
+      if (!user) {
         throw new NotFoundException({
           type: process.env.API_DOCUMENTATION,
           title: 'user not found',
@@ -178,7 +181,7 @@ export class UsersController {
           instance: '/users/:id',
         });
       }
-      return response;
+      return user;
     } catch (error) {
       this.logger.error('An unexpected error occurred:', error);
       if (error instanceof NotFoundException) {
@@ -225,8 +228,8 @@ export class UsersController {
     @Body() updateUserDto: UpdateUserDto,
   ): Promise<User> {
     try {
-      const response: User = await this.usersService.update(+id, updateUserDto);
-      if (!response) {
+      const user: User = await this.usersService.update(+id, updateUserDto);
+      if (!user) {
         throw new NotFoundException({
           type: process.env.API_DOCUMENTATION,
           title: 'User not found',
@@ -235,7 +238,7 @@ export class UsersController {
           instance: '/users/:id',
         });
       }
-      return response;
+      return user;
     } catch (error) {
       this.logger.error(
         'An unexpected error occurred during user update:',
@@ -280,9 +283,9 @@ export class UsersController {
     description: 'Erro interno do servidor ao remover o usuário',
   })
   @Delete(':id')
-  async remove(@Param('id') id: string): Promise<void> {
+  async remove(@Param('id') id: string): Promise<boolean> {
     try {
-      const result = await this.usersService.remove(id);
+      const result: boolean = await this.usersService.remove(id);
       if (!result) {
         throw new NotFoundException({
           type: process.env.API_DOCUMENTATION,
@@ -292,7 +295,7 @@ export class UsersController {
           instance: `/users/${id}`,
         });
       }
-      return null;
+      return false;
     } catch (error) {
       this.logger.error(
         'An unexpected error occurred during user deletion:',
