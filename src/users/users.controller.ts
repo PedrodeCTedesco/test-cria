@@ -38,20 +38,20 @@ export class UsersController {
   })
   @ApiResponse({
     status: 201,
-    description: 'Usuário criado e registrado com sucesso',
+    description: 'The user was created',
   })
   @ApiResponse({
     status: 400,
     description:
-      'Ausência de propriedade e/ou valor inválido no payload de criação de novo usuário',
+      'Data format must be a valid JSON',
   })
   @ApiResponse({
     status: 409,
-    description: 'Usuário já existe com esse nome de usuário',
+    description: 'There is already a user with that username',
   })
   @ApiResponse({
     status: 500,
-    description: 'Erro interno do servidor ao criar novo usuário',
+    description: 'Internal server error during POST operation',
   })
   @Post()
   @UsePipes(new ValidationPipe({ whitelist: true }))
@@ -63,34 +63,32 @@ export class UsersController {
         createUserDto.username,
       );
 
+      if(user) {
+        throw new ConflictException({
+          type: process.env.API_DOCUMENTATION,
+          title: 'User Already Exists',
+          status: 409,
+          detail: `A user with the username ${createUserDto.username} already exists.`,
+          instance: '/users',
+        });
+      }
+
       if (!user) return await this.usersService.create(createUserDto);
 
-      throw new ConflictException({
-        type: process.env.API_DOCUMENTATION,
-        title: 'User Already Exists',
-        status: 409,
-        detail: `A user with the username ${createUserDto.username} already exists.`,
-        instance: '/users',
-      });
     } catch (error) {
       this.logger.error(
         'An unexpected error occurred during user creation:',
         error,
       );
-      if (error instanceof InternalServerErrorException) {
-        throw error;
-      } else if (error instanceof BadRequestException) {
-        throw new InternalServerErrorException({
+      if (error instanceof BadRequestException) {
+        throw new BadRequestException({
           type: process.env.API_DOCUMENTATION,
           title: 'Bad Request',
           status: 400,
-          detail: 'Invalid input data',
+          detail: 'Data format must be a valid JSON. Check the if the properties username or password are present in a valid format',
           instance: '/users',
         });
-      } else if (error instanceof ConflictException) {
-        throw error; // Retornar o erro de conflito sem modificar
-      } else {
-        console.error('Unexpected error occurred during user creation:', error);
+      } else (error instanceof InternalServerErrorException) 
         throw new InternalServerErrorException({
           type: process.env.API_DOCUMENTATION,
           title: 'Unexpected Internal Server Error',
@@ -98,7 +96,6 @@ export class UsersController {
           detail: 'An unexpected error occurred during user creation',
           instance: '/users',
         });
-      }
     }
   }
 
@@ -219,6 +216,10 @@ export class UsersController {
     description: 'Dados inválidos para atualização do usuário',
   })
   @ApiResponse({
+    status: 404,
+    description: 'Usuário não encontrado para atualização',
+  })
+  @ApiResponse({
     status: 500,
     description: 'Erro interno do servidor ao atualizar o usuário',
   })
@@ -241,21 +242,25 @@ export class UsersController {
       return user;
     } catch (error) {
       this.logger.error(
-        'An unexpected error occurred during user update:',
+        'An unexpected error occurred during user update',
         error,
       );
       if (error instanceof NotFoundException) {
         throw error;
-      } else {
-        this.logger.error(
-          'Unexpected error occurred during user update:',
-          error,
-        );
+      } else if (error instanceof InternalServerErrorException) {
         throw new InternalServerErrorException({
           type: process.env.API_DOCUMENTATION,
           title: 'Unexpected Internal Server Error',
           status: 500,
           detail: 'An unexpected error occurred during user update',
+          instance: '/users/:id',
+        });
+      } else if (error instanceof BadRequestException) {
+        throw new BadRequestException({
+          type: process.env.API_DOCUMENTATION,
+          title: 'Bad request',
+          status: 400,
+          detail: 'Data format must be a valid JSON',
           instance: '/users/:id',
         });
       }

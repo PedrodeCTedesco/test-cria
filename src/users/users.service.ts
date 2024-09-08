@@ -69,7 +69,7 @@ export class UsersService {
         type: process.env.API_DOCUMENTATION,
         title: 'Internal Server Error',
         status: 500,
-        detail: 'An unexpected error occurred while searching for the user',
+        detail: `An unexpected error occurred while searching for the user ${username}`,
         instance: '/users',
       });
     }

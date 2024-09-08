@@ -1,11 +1,11 @@
+A aplicação consiste em um endpoint /users que permite operações CRUD. As rotas são protegidas por JWT.
+Você pode rodar a aplicação em seu ambiente local ou gerar as imagens Docker e rodá-las em contêineres.
 
-# Documentação da API
-Swagger: http://localhost:8010/api
+Para realização de testes utilize o comando:
 
-# Documentação técnica
+- npm run test
 
-Consulte o diretório ./documentation 
-Caso não o encontre rode o comando: npm run docs
+
 
 # Ambiente local
 
@@ -95,3 +95,12 @@ Verifique os arquivos de configuração para dúvidas pontuais:
 
 - docker-compose.yml
 - Dockerfile
+
+
+# Documentação da API
+Swagger: http://localhost:8010/api
+
+# Documentação técnica
+
+Consulte o diretório ./documentation 
+Caso não o encontre rode o comando: npm run docs

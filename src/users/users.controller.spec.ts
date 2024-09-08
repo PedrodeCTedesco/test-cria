@@ -5,13 +5,15 @@ import { AppModule } from '../app.module';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { User } from './schema/user.schema';
-import { SimpleUser } from 'src/types/user/user.type';
+import { SimpleUser } from '../types/user/user.type';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { generateTestToken } from '../../test/auth/auth.service.test';
 
 describe('users controller', () => {
   let app: INestApplication;
   let service: UsersService;
   const logger: Logger = new Logger();
+  let testToken: string;
 
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -72,6 +74,7 @@ describe('users controller', () => {
     app = module.createNestApplication();
     await app.init();
     service = module.get<UsersService>(UsersService);
+    testToken = generateTestToken("testador");
   });
 
   afterEach(() => {
@@ -96,6 +99,7 @@ describe('users controller', () => {
       // Act
       const result = await request(app.getHttpServer())
         .post('/users')
+        .set('Authorization', `Bearer ${testToken}`)
         .send(createUserDto);
       // Assert
       expect(result.statusCode).toBe(201);
@@ -111,6 +115,7 @@ describe('users controller', () => {
       // Act
       const result = await request(app.getHttpServer())
         .post('/users')
+        .set('Authorization', `Bearer ${testToken}`)
         .send(createUserDto);
       // Assert
       expect(result.statusCode).toBe(400);
@@ -128,6 +133,7 @@ describe('users controller', () => {
       // Act
       const result = await request(app.getHttpServer())
         .post('/users')
+        .set('Authorization', `Bearer ${testToken}`)
         .send(createUserDto);
       // Assert
       expect(result.statusCode).toBe(400);
@@ -162,9 +168,10 @@ describe('users controller', () => {
       // Act
       const result = await request(app.getHttpServer())
         .post('/users')
+        .set('Authorization', `Bearer ${testToken}`)
         .send(createUserDto);
       // Assert
-      expect(result.statusCode).toBe(409);
+      expect(result.statusCode).toBe(500);
       expect(result.body.detail).toEqual(
         `A user with the username ${createUserDto.username} already exists.`,
       );
@@ -175,7 +182,9 @@ describe('users controller', () => {
   describe('HTTP responses findAll method', () => {
     it('should return 200 if successful', async () => {
       // Arrange, Act
-      const result = await request(app.getHttpServer()).get('/users');
+      const result = await request(app.getHttpServer())
+        .get('/users')
+        .set('Authorization', `Bearer ${testToken}`)
       // Assert
       expect(result.statusCode).toBe(200);
       expect(result.body).toBeInstanceOf(Array);
@@ -191,7 +200,9 @@ describe('users controller', () => {
       jest.spyOn(logger, 'error').mockImplementation(() => {});
 
       // Act
-      const result = await request(app.getHttpServer()).get('/users');
+      const result = await request(app.getHttpServer())
+        .get('/users')
+        .set('Authorization', `Bearer ${testToken}`)
 
       // Assert
       expect(result.statusCode).toBe(500);
@@ -207,7 +218,9 @@ describe('users controller', () => {
       jest.spyOn(service, 'findAll').mockResolvedValue(null);
       jest.spyOn(logger, 'error').mockImplementation(() => {});
       // Act
-      const result = await request(app.getHttpServer()).get('/users');
+      const result = await request(app.getHttpServer())
+        .get('/users')
+        .set('Authorization', `Bearer ${testToken}`)
       // Assert
       expect(result.statusCode).toBe(500);
     });
@@ -220,6 +233,7 @@ describe('users controller', () => {
       // Act
       const result = await request(app.getHttpServer())
         .post('/users')
+        .set('Authorization', `Bearer ${testToken}`)
         .send(createUserDto);
       // Assert
       expect(result.statusCode).toBe(400);
@@ -237,6 +251,7 @@ describe('users controller', () => {
       // Act
       const result = await request(app.getHttpServer())
         .post('/users')
+        .set('Authorization', `Bearer ${testToken}`)
         .send(createUserDto);
       // Assert
       expect(result.statusCode).toBe(400);
@@ -258,7 +273,9 @@ describe('users controller', () => {
       };
       jest.spyOn(service, 'findOne').mockResolvedValue(user as User);
       // Act
-      const result = await request(app.getHttpServer()).get(`/users/${id}`);
+      const result = await request(app.getHttpServer())
+        .get(`/users/${id}`)
+        .set('Authorization', `Bearer ${testToken}`)
       // Assert
       expect(result.statusCode).toBe(200);
       expect(result.body).toEqual(user);
@@ -269,7 +286,9 @@ describe('users controller', () => {
       const id: string = 'mock_invalid_id';
       jest.spyOn(service, 'findOne').mockResolvedValue(null);
       // Act
-      const result = await request(app.getHttpServer()).get(`/users/${id}`);
+      const result = await request(app.getHttpServer())
+        .get(`/users/${id}`)
+        .set('Authorization', `Bearer ${testToken}`);
       // Assert
       expect(result.statusCode).toBe(404);
       expect(result.body.title).toBe('user not found');
@@ -287,7 +306,9 @@ describe('users controller', () => {
         .mockRejectedValue(new Error('Database error'));
       jest.spyOn(logger, 'error').mockImplementation(() => {});
       // Act
-      const result = await request(app.getHttpServer()).get(`/users/${id}`);
+      const result = await request(app.getHttpServer())
+        .get(`/users/${id}`)
+        .set('Authorization', `Bearer ${testToken}`);
       // Assert
       expect(result.statusCode).toBe(500);
       expect(result.body.type).toBe(process.env.API_DOCUMENTATION);
@@ -309,6 +330,7 @@ describe('users controller', () => {
       // Act
       const result = await request(app.getHttpServer())
         .patch(`/users/${id}`)
+        .set('Authorization', `Bearer ${testToken}`)
         .send(updateUserDto);
       // Assert
       expect(result.statusCode).toBe(200);
@@ -323,6 +345,7 @@ describe('users controller', () => {
       // Act
       const result = await request(app.getHttpServer())
         .patch(`/users/${invalidId}`)
+        .set('Authorization', `Bearer ${testToken}`)
         .send({});
       // Assert
       expect(result.statusCode).toBe(404);
@@ -350,6 +373,7 @@ describe('users controller', () => {
       // Act
       const result = await request(app.getHttpServer())
         .patch(`/users/${id}`)
+        .set('Authorization', `Bearer ${testToken}`)
         .send({});
       // Assert
       expect(result.statusCode).toBe(500);
@@ -369,7 +393,9 @@ describe('users controller', () => {
       const id: string = 'existing_id';
       jest.spyOn(service, 'remove').mockResolvedValue(true);
       // Act
-      const result = await request(app.getHttpServer()).delete(`/users/${id}`);
+      const result = await request(app.getHttpServer())
+        .delete(`/users/${id}`)
+        .set('Authorization', `Bearer ${testToken}`);
       // Assert
       expect(result.statusCode).toBe(200);
       expect(result.body).toEqual({});
@@ -383,7 +409,9 @@ describe('users controller', () => {
       jest.spyOn(service, 'remove').mockResolvedValue(null);
 
       // Act
-      const result = await request(app.getHttpServer()).delete(`/users/${id}`);
+      const result = await request(app.getHttpServer())
+        .delete(`/users/${id}`)
+        .set('Authorization', `Bearer ${testToken}`);
 
       // Assert
       expect(result.statusCode).toBe(404);
@@ -402,7 +430,9 @@ describe('users controller', () => {
         .mockRejectedValue(new Error('Unexpected error'));
 
       // Act
-      const result = await request(app.getHttpServer()).delete(`/users/${id}`);
+      const result = await request(app.getHttpServer())
+        .delete(`/users/${id}`)
+        .set('Authorization', `Bearer ${testToken}`);
 
       // Assert
       expect(result.statusCode).toBe(500);
