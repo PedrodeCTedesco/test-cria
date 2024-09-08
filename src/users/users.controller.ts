@@ -171,7 +171,7 @@ export class UsersController {
   @Get(':id')
   async findOne(@Param('id') id: string): Promise<User> {
     try {
-      const user: User = await this.usersService.findOne(+id);
+      const user: User = await this.usersService.findOne(id);
       if (!user) {
         throw new NotFoundException({
           type: process.env.API_DOCUMENTATION,
@@ -228,7 +228,7 @@ export class UsersController {
     @Body() updateUserDto: UpdateUserDto,
   ): Promise<User> {
     try {
-      const user: User = await this.usersService.update(+id, updateUserDto);
+      const user: User = await this.usersService.update(id, updateUserDto);
       if (!user) {
         throw new NotFoundException({
           type: process.env.API_DOCUMENTATION,

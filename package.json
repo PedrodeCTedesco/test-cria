@@ -36,7 +36,9 @@
     "node": "v20.11.1"
   },
   "eslintConfig": {
-    "extends": ["${ESLINT_CONFIG_EXTEND}"],
+    "extends": [
+      "${ESLINT_CONFIG_EXTEND}"
+    ],
     "parserOptions": {
       "ecmaVersion": 2020,
       "sourceType": "module"
@@ -71,6 +73,7 @@
     "swagger-ui-express": "^5.0.1"
   },
   "devDependencies": {
+    "@compodoc/compodoc": "^1.1.25",
     "@nestjs/cli": "^10.0.0",
     "@nestjs/schematics": "^10.0.0",
     "@nestjs/testing": "^10.0.0",
@@ -115,11 +118,11 @@
     "testEnvironment": "node"
   },
   "keywords": [
-  "nestjs",
-  "mongodb",
-  "typescript",
-  "jwt",
-  "passport"
+    "nestjs",
+    "mongodb",
+    "typescript",
+    "jwt",
+    "passport"
   ],
   "homepage": "https://github.com/PedrodeCTedesco/test-cria#readme",
   "prettier": {

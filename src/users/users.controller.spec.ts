@@ -333,6 +333,13 @@ describe('users controller', () => {
       expect(result.body.instance).toBe('/users/:id');
     });
 
+    it("should return 400 if a bad request is made", async () => {
+      // Arrange
+      const teste = "oi"
+      // Assert
+      expect(test).toBe(404)
+    });
+
     it('should return 500 if an unexpected error occurs', async () => {
       // Arrange
       const id: string = 'valid_id';

@@ -44,7 +44,7 @@ export class UsersService {
     }
   }
 
-  async findOne(id: number): Promise<User> {
+  async findOne(id: string): Promise<User> {
     try {
       const response: User = await this.userModel.findById(id).exec();
       if (!response)
@@ -76,7 +76,7 @@ export class UsersService {
   }
 
   async update(
-    id: number,
+    id: string,
     updateUserDto: Partial<UpdateUserDto>,
   ): Promise<User> {
     try {
