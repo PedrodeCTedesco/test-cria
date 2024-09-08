@@ -58,22 +58,35 @@ Docker Compose version v2.29.1-desktop.1
 ## Orientações
 
 1. Clone o projeto do repositório do GitHub (disponível em package.json, repositories)
+2. Execute o comando para construir as imagens sem iniciar os contêineres:
 
-Scripts para rodar a aplicação:
-- npm run:docker --> apenas inicia os contêineres.
+- npm run build:docker
 
-2. Execute o comando:
+Se desejar construir as imagens e rodar os contêineres em primeiro plano execute:
 
-- npm run build:docker (constrói as imagens sem iniciar os contêineres)
-
-Em seguida rode o comando: 
-
-- npm run start:docker (constrói e executa os contêineres)
+- npm run start:docker 
 
 A aplicação estará acessível em http://localhost:8010
 
-Caso já tenha as imagens prontas e não queira realizar o rebuild:
-- npm run run:docker
+Caso queira rodar a aplicação em segundo plano para utilizar outros comandos do Docker (como docker ps) utilize o comando:
+
+- npm run start:docker:detach
+
+Agora você poderá verificar os contêineres em execução com:
+
+- docker ps
+
+Ou mesmo verificar as imagens:
+
+- docker images
+
+Para visualizar os logs das aplicações:
+
+- npm run logs:docker
+
+Caso queira parar os contêineres utilize:
+
+- npm run stop:docker
 
 Para interagir com a aplicação siga os passos descritos na seção *como usar* do ambiente local.
 

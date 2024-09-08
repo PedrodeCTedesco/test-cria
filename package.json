@@ -22,7 +22,10 @@
     "docs": "compodoc -p tsconfig.json -w",
     "start:docker": "docker-compose up --build",
     "build:docker": "docker-compose -f docker-compose.yml build",
-    "run:docker": "docker-compose -f docker-compose.yml up"
+    "run:docker": "docker-compose -f docker-compose.yml up",
+    "start:docker:detach": "docker-compose up -d --build",
+    "stop:docker": "docker-compose down",
+    "logs:docker": "docker-compose logs -f"
   },
   "config": {
     "port": "${PORT}",
