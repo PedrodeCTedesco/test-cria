@@ -1,23 +1,50 @@
 {
   "name": "test-cria",
   "version": "0.0.1",
-  "description": "",
-  "author": "",
+  "description": "Teste técnico para Cria Digital",
+  "author": "Pedro de Castro Tedesco",
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
-    "build": "nest build",
-    "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
+    "build": "nest build",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./test/jest-e2e.json"
+    "test:e2e": "jest --config ./test/jest-e2e.json",
+    "prettier": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
+    "format": "npm run prettier && npm run lint",
+    "docs": "compodoc -p tsconfig.json -w",
+    "start:docker": "docker-compose up --build",
+    "build:docker": "docker-compose -f docker-compose.yml build",
+    "run:docker": "docker-compose -f docker-compose.yml up"
+  },
+  "config": {
+    "port": "${PORT}",
+    "productionMode": "${NODE_ENV === 'production'}",
+    "mongoConnections": {
+      "local": "${MONGODB_URI_LOCAL}",
+      "docker": "${MONGODB_URI_DOCKER}"
+    }
+  },
+  "engines": {
+    "node": "v20.11.1"
+  },
+  "eslintConfig": {
+    "extends": ["${ESLINT_CONFIG_EXTEND}"],
+    "parserOptions": {
+      "ecmaVersion": 2020,
+      "sourceType": "module"
+    },
+    "env": {
+      "es6": true,
+      "node": true
+    }
   },
   "dependencies": {
     "@nestjs/common": "^10.0.0",
@@ -86,5 +113,34 @@
     ],
     "coverageDirectory": "../coverage",
     "testEnvironment": "node"
+  },
+  "keywords": [
+  "nestjs",
+  "mongodb",
+  "typescript",
+  "jwt",
+  "passport"
+  ],
+  "homepage": "https://github.com/PedrodeCTedesco/test-cria#readme",
+  "prettier": {
+    "printWidth": 100,
+    "tabWidth": 2,
+    "useTabs": false,
+    "semi": true,
+    "singleQuote": true,
+    "trailingComma": "es5",
+    "bracketSpacing": true,
+    "arrowParens": "always",
+    "endOfLine": "auto"
+  },
+  "repositories": {
+    "type": "git",
+    "url": "https://github.com/PedrodeCTedesco/test-cria.git"
+  },
+  "swagger": {
+    "title": "${SWAGGER_TITLE}",
+    "description": "${SWAGGER_DESCRIPTION}",
+    "version": "${SWAGGER_VERSION}",
+    "path": "${SWAGGER_PATH}"
   }
 }
