@@ -54,18 +54,31 @@ Nesta seção temos as instruções para rodar a aplicação em Docker.
 ## Requisitos
 Docker version: 27.1.1
 Docker Compose version v2.29.1-desktop.1
-Variáveis de ambiente em .env.production
 
 ## Orientações
-Scripts para rodar a aplicação:
 
-- npm run build:docker --> constrói as imagens sem iniciar os contêineres.
-- npm run start:docker --> constrói e executa os contêineres.
+1. Clone o projeto do repositório do GitHub (disponível em package.json, repositories)
+
+Scripts para rodar a aplicação:
 - npm run:docker --> apenas inicia os contêineres.
+
+2. Execute o comando:
+
+- npm run build:docker (constrói as imagens sem iniciar os contêineres)
+
+Em seguida rode o comando: 
+
+- npm run start:docker (constrói e executa os contêineres)
+
+A aplicação estará acessível em http://localhost:8010
+
+Caso já tenha as imagens prontas e não queira realizar o rebuild:
+- npm run run:docker
+
+Para interagir com a aplicação siga os passos descritos na seção *como usar* do ambiente local.
 
 ## Configurações
 Verifique os arquivos de configuração para dúvidas pontuais:
 
 - docker-compose.yml
 - Dockerfile
-- .env.production

@@ -13,7 +13,11 @@ import { APP_GUARD } from '@nestjs/core';
     ConfigModule.forRoot({
       isGlobal: true,
     }),
-    MongooseModule.forRoot(process.env.MONGODB_URI_LOCAL),
+    MongooseModule.forRoot(
+      process.env.NODE_ENV === 'production'
+        ? process.env.MONGODB_URI_DOCKER
+        : process.env.MONGODB_URI_LOCAL
+    ),
     UsersModule,
     AuthModule,
   ],
