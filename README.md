@@ -1,28 +1,32 @@
-A aplicação consiste em um endpoint /users que permite operações CRUD. As rotas são protegidas por JWT.
+A aplicação consiste em um endpoint /users que permite operações CRUD. 
+As rotas são protegidas por JWT.
 Você pode rodar a aplicação em seu ambiente local ou gerar as imagens Docker e rodá-las em contêineres.
+
+*Importante*: os arquivos de configuração como .env e Dockerfile estão presentes para fins de facilitar a execução da aplicação ao clonar o repositório.
 
 Para realização de testes utilize o comando:
 
 - npm run test
-
-
 
 # Ambiente local
 
 Nesta seção temos as instruções para rodar a aplicação em ambiente local.
 
 ## Requisitos
-Node version: v20.11.1
-NPM version: 10.8.2
+- Node version: v20.11.1
+- NPM version: 10.8.2
+- MongoDB Compass: 1.44.3
+- MongoDB Server: 7.0.14
 
 ## Orientações
 
 1. Clone o projeto do repositório do GitHub (disponível em package.json, repositories);
-2. Instale as dependências com o comando npm install
-3. Scripts para rodar a aplicação:
+2. Certifique-se que está na _branch_ *prod*;
+3. Instale as dependências com o comando npm install
+4. Scripts para rodar a aplicação:
 
-- npm run build --> para build da aplicação
-- npm run start:dev --> inicia a aplicação em modo de desenvolvimento
+- npm run build: para build da aplicação
+- npm run start:dev: inicia a aplicação em modo de desenvolvimento
 
 ## Como usar
 A aplicação possui um endpoint chamado '/users'. Para poder acessá-lo e realizar operações CRUD você precisa de um token de acesso. 
@@ -52,8 +56,9 @@ Para saber quais as rotas disponíveis verifique a documentação da API.
 Nesta seção temos as instruções para rodar a aplicação em Docker.
 
 ## Requisitos
-Docker version: 27.1.1
-Docker Compose version v2.29.1-desktop.1
+
+- Docker version: 27.1.1
+- Docker Compose version v2.29.1-desktop.1
 
 ## Orientações
 
