@@ -1,0 +1,35 @@
+services:
+  nest-app:
+    image: nest-app
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+    container_name: nest-app-container
+    ports:
+      - '${PORT}:8010'
+    env_file: 
+      - .env.production
+    depends_on:
+      - mongo
+    networks:
+      - app-network
+
+  mongo:
+    image: mongo:latest
+    container_name: mongo-container
+    ports:
+      - '27017:27017'
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+    volumes:
+      - mongo-data:/data/db
+    networks:
+      - app-network
+
+volumes:
+  mongo-data:
+
+networks:
+  app-network:
