@@ -63,13 +63,12 @@ Nesta seção temos as instruções para rodar a aplicação em Docker.
 ## Orientações
 
 1. Clone o projeto do repositório do GitHub (disponível em package.json, repositories)
-2. Execute o comando para construir as imagens sem iniciar os contêineres:
+2. Certifique-se que está na _branch_ *prod*;
+3. Instale as dependências com o comando npm install
+4. Scripts para rodar a aplicação:
 
-- npm run build:docker
-
-Se desejar construir as imagens e rodar os contêineres em primeiro plano execute:
-
-- npm run start:docker 
+- npm run build:docker (para construir as imagens sem iniciar os contêineres)
+- npm run start:docker (para construir as imagens e rodar os contêineres em primeiro plano execute)
 
 A aplicação estará acessível em http://localhost:8010
 
@@ -107,5 +106,5 @@ Swagger: http://localhost:8010/api
 
 # Documentação técnica
 
-Consulte o diretório ./documentation 
-Caso não o encontre rode o comando: npm run docs
+- Consulte o diretório ./documentation 
+- Caso não o encontre rode o comando: npm run docs
