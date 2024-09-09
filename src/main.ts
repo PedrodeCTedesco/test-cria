@@ -1,7 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import * as cookieParser from 'cookie-parser';
+import * as YAML from 'yamljs';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -14,15 +14,8 @@ async function bootstrap() {
    });
    
   // Configuração do Swagger
-  const config = new DocumentBuilder()
-    .setTitle('API Cria')
-    .setDescription('API desenvolvida para teste técnico')
-    .setVersion('1.0')
-    .addBearerAuth()
-    .build();
-
-  const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, document);
+  const swaggerDocument = YAML.load('swagger.yaml');
+  SwaggerModule.setup('api', app, swaggerDocument)
 
   await app.listen(process.env.PORT);
 }

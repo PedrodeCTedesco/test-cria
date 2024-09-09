@@ -33,6 +33,7 @@ A aplicação possui um endpoint chamado '/users'. Para poder acessá-lo e reali
 Para gerar seu token de acesso siga os passos abaixo:
 
 1. Envie via Postman/Insomnia uma requisição POST para http://localhost:8010/auth/register cujo corpo é:
+
 {
     "username": [seu nome de usuário],
     "password": [sua senha]
@@ -49,6 +50,13 @@ Você terá como retorno o seu token de acesso:
 'Authorization': 'Bearer [token]'
 
 Para saber quais as rotas disponíveis verifique a documentação da API.
+
+3. Após o token expirar você pode obter um novo token através da rota: http://localhost:8010/auth/login utilizando no corpo da requisição as mesmas credenciais utilizadas no registro.
+
+{
+    "username": [seu nome de usuário],
+    "password": [sua senha]
+}
 
 
 # Ambiente Docker

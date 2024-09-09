@@ -19,10 +19,6 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './schema/user.schema';
 import {
-  ApiBody,
-  ApiOperation,
-  ApiParam,
-  ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
 
@@ -33,26 +29,6 @@ export class UsersController {
 
   constructor(private readonly usersService: UsersService) {}
 
-  @ApiOperation({
-    summary: 'Registro de um novo usuário no banco',
-  })
-  @ApiResponse({
-    status: 201,
-    description: 'The user was created',
-  })
-  @ApiResponse({
-    status: 400,
-    description:
-      'Data format must be a valid JSON',
-  })
-  @ApiResponse({
-    status: 409,
-    description: 'There is already a user with that username',
-  })
-  @ApiResponse({
-    status: 500,
-    description: 'Internal server error during POST operation',
-  })
   @Post()
   @UsePipes(new ValidationPipe({ whitelist: true }))
   async create(
@@ -99,23 +75,6 @@ export class UsersController {
     }
   }
 
-  @ApiOperation({
-    summary: 'Retorna uma lista de todos os usuários registrados no banco',
-  })
-  @ApiBody({ type: CreateUserDto })
-  @ApiResponse({
-    status: 200,
-    description: 'Lista de usuários retornada com sucesso',
-    type: [User],
-  })
-  @ApiResponse({
-    status: 400,
-    description: 'Payload incompleto',
-  })
-  @ApiResponse({
-    status: 500,
-    description: 'Erro interno do servidor ao buscar os usuários',
-  })
   @Get()
   async findAll(): Promise<User[]> {
     try {
@@ -149,22 +108,6 @@ export class UsersController {
     }
   }
 
-  @ApiOperation({
-    summary: 'Retorna um usuário específico baseado no ID',
-  })
-  @ApiResponse({
-    status: 200,
-    description: 'Usuário encontrado e retornado com sucesso',
-    type: User,
-  })
-  @ApiResponse({
-    status: 404,
-    description: 'Usuário não encontrado',
-  })
-  @ApiResponse({
-    status: 500,
-    description: 'Erro interno do servidor ao buscar o usuário',
-  })
   @Get(':id')
   async findOne(@Param('id') id: string): Promise<User> {
     try {
@@ -197,32 +140,37 @@ export class UsersController {
     }
   }
 
-  @ApiOperation({
-    summary: 'Atualiza um usuário específico baseado no ID',
-  })
-  @ApiBody({ type: UpdateUserDto })
-  @ApiParam({
-    name: 'id',
-    type: String,
-    description: 'ID do usuário a ser atualizado',
-  })
-  @ApiResponse({
-    status: 200,
-    description: 'Usuário atualizado com sucesso',
-    type: User,
-  })
-  @ApiResponse({
-    status: 400,
-    description: 'Dados inválidos para atualização do usuário',
-  })
-  @ApiResponse({
-    status: 404,
-    description: 'Usuário não encontrado para atualização',
-  })
-  @ApiResponse({
-    status: 500,
-    description: 'Erro interno do servidor ao atualizar o usuário',
-  })
+  @Get('username/:username')
+  async findOneByUsername(@Param('username') username: string): Promise<User> {
+    try {
+      const user: User = await this.usersService.findOneByUsername(username);
+      if (!user) {
+        throw new NotFoundException({
+          type: process.env.API_DOCUMENTATION,
+          title: 'user not found',
+          status: 404,
+          detail: `Check the username because there is no user with the username ${username}`,
+          instance: '/users/username/:username',
+        });
+      }
+      return user;
+    } catch (error) {
+      this.logger.error('An unexpected error occurred:', error);
+      if (error instanceof NotFoundException) {
+        throw error;
+      } else {
+        console.error('Unexpected error occurred:', error);
+        throw new InternalServerErrorException({
+          type: process.env.API_DOCUMENTATION,
+          title: 'Unexpected Internal Server Error',
+          status: 500,
+          detail: 'An unexpected error occurred',
+          instance: '/users/username/:username',
+        });
+      }
+    }
+  }
+
   @Patch(':id')
   async update(
     @Param('id') id: string,
@@ -267,26 +215,6 @@ export class UsersController {
     }
   }
 
-  @ApiOperation({
-    summary: 'Remove um usuário específico baseado no ID',
-  })
-  @ApiParam({
-    name: 'id',
-    type: String,
-    description: 'ID do usuário a ser removido',
-  })
-  @ApiResponse({
-    status: 200,
-    description: 'Usuário removido com sucesso',
-  })
-  @ApiResponse({
-    status: 404,
-    description: 'Usuário não encontrado',
-  })
-  @ApiResponse({
-    status: 500,
-    description: 'Erro interno do servidor ao remover o usuário',
-  })
   @Delete(':id')
   async remove(@Param('id') id: string): Promise<boolean> {
     try {

@@ -1,0 +1,208 @@
+openapi: 3.0.0
+info:
+  title: API de Usuários
+  description: API para registro e gerenciamento de usuários
+  version: 1.0.0
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+servers:
+  - url: http://localhost:8010
+    description: Servidor da aplicação
+paths:
+  /users:
+    post:
+      summary: Registro de um novo usuário
+      operationId: createUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateUserDto'
+      responses:
+        '201':
+          description: O usuário foi criado com sucesso.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          description: Formato dos dados deve ser um JSON válido. Verifique se as propriedades username e password estão presentes e no formato correto.
+        '409':
+          description: Já existe um usuário com esse nome de usuário.
+        '500':
+          description: Erro interno do servidor durante a operação POST.
+      security:
+        - BearerAuth: []
+      tags:
+        - Usuários
+    get:
+      summary: Retorna uma lista de todos os usuários registrados no banco
+      operationId: findAllUsers
+      responses:
+        '200':
+          description: Lista de usuários retornada com sucesso
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+        '400':
+          description: Payload incompleto
+        '500':
+          description: Erro interno do servidor ao buscar os usuários
+      security:
+        - BearerAuth: []
+      tags:
+        - Usuários
+  /users/{id}:
+    get:
+      summary: Retorna um usuário específico baseado no ID
+      operationId: findOneUser
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: ID do usuário a ser retornado
+      responses:
+        '200':
+          description: Usuário encontrado e retornado com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '404':
+          description: Usuário não encontrado
+        '500':
+          description: Erro interno do servidor ao buscar o usuário
+      security:
+        - BearerAuth: []
+      tags:
+        - Usuários
+    patch:
+      summary: Atualiza um usuário específico baseado no ID
+      operationId: updateUser
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: ID do usuário a ser atualizado
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateUserDto'
+      responses:
+        '200':
+          description: Usuário atualizado com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          description: Dados inválidos para atualização do usuário
+        '404':
+          description: Usuário não encontrado para atualização
+        '500':
+          description: Erro interno do servidor ao atualizar o usuário
+      security:
+        - BearerAuth: []
+      tags:
+        - Usuários
+    delete:
+      summary: Remove um usuário específico baseado no ID
+      operationId: deleteUser
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: ID do usuário a ser removido
+      responses:
+        '200':
+          description: Usuário removido com sucesso
+        '404':
+          description: Usuário não encontrado
+        '500':
+          description: Erro interno do servidor ao remover o usuário
+      security:
+        - BearerAuth: []
+      tags:
+        - Usuários
+  /users/username/{username}:
+    get:
+      summary: Retorna um usuário específico baseado no nome de usuário
+      operationId: findOneByUsername
+      parameters:
+        - name: username
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Nome de usuário do usuário a ser retornado
+      responses:
+        '200':
+          description: Usuário encontrado e retornado com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '404':
+          description: Usuário não encontrado
+        '500':
+          description: Erro interno do servidor ao buscar o usuário
+      security:
+        - BearerAuth: []
+      tags:
+        - Usuários
+components:
+  schemas:
+    CreateUserDto:
+      type: object
+      properties:
+        username:
+          type: string
+          example: "user123"
+        password:
+          type: string
+          example: "P@ssw0rd!"
+      required:
+        - username
+        - password
+    UpdateUserDto:
+      type: object
+      properties:
+        username:
+          type: string
+          example: "user123_updated"
+        password:
+          type: string
+          example: "NewP@ssw0rd!"
+      required:
+        - username
+        - password
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          example: "131djahu13i"
+        username:
+          type: string
+          example: "user123"
+        password:
+          type: string
+          example: "P@ssw0rd!"
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
