@@ -11,7 +11,7 @@ npm run test
 
 # Ambiente local
 
-Para rodar a aplicação em ambiente local você se certificar que o Mongo Server está ativo e funcionando com as configurações corretas.
+Para rodar a aplicação em ambiente local você deve se certificar que o Mongo Server está ativo e funcionando com as configurações corretas.
 
 ## Requisitos
 
@@ -35,11 +35,17 @@ Para rodar a aplicação em ambiente local você se certificar que o Mongo Serve
 1. Clone o projeto do repositório do GitHub;
 2. Certifique-se que está na _branch_ **prod**;
 3. Inicie o Mongo Server;
-4. Instale as dependências com o comando ```bash npm install ```
+4. Instale as dependências com o comando ``` npm install ```
 5. _Scripts_ para rodar a aplicação:
 
-```bash npm run build ``` para build da aplicação
-```bash npm run start:dev ``` inicia a aplicação em modo de desenvolvimento
+```bash 
+npm run build 
+``` 
+
+```bash 
+npm run start:dev 
+``` 
+
 
 ## Como usar
 A aplicação possui um endpoint chamado '/users'. Para poder acessá-lo e realizar operações CRUD você precisa de um token de acesso. 
@@ -63,8 +69,9 @@ Você terá como retorno o seu token de acesso:
 ```
 
 2. Com seu token de acesso você poderá acessar as rotas GET, POST, DELETE e PATCH enviando o token no cabeçalho da requisição:
-
-'Authorization': 'Bearer [token]'
+```json
+'Authorization': 'Bearer "[token]"'
+```
 
 Para saber quais as rotas estão disponíveis verifique a documentação da API.
 
@@ -95,32 +102,49 @@ Para rodar a aplicação em Docker.
 2. Certifique-se que está na _branch_ **prod**;
 3. _Scripts_ para rodar a aplicação:
 
-```bash npm run build:docker ``` para construir as imagens sem iniciar os contêineres
-```bash npm run start:docker ``` para construir as imagens e rodar os contêineres em primeiro plano
+Para construir as imagens sem iniciar os contêineres
+
+```bash 
+npm run build:docker 
+```
+
+Para construir as imagens e rodar os contêineres em primeiro plano
+
+```bash 
+npm run start:docker 
+``` 
 
 A aplicação estará acessível em http://localhost:8010
 
 Caso queira rodar a aplicação em segundo plano utilize o comando:
 
-```bash npm run start:docker:detach ```
+```bash 
+npm run start:docker:detach 
+```
 
 Agora você poderá verificar os contêineres em execução com:
 
 ```bash
-- docker ps
+docker ps
 ```
 
 Ou mesmo verificar as imagens:
 
-```bash docker images ```
+```bash 
+docker images 
+```
 
 Para visualizar os logs das aplicações:
 
-```bash npm run logs:docker ```
+```bash 
+npm run logs:docker 
+```
 
 Caso queira parar os contêineres utilize:
 
-```bash npm run stop:docker ```
+```bash 
+npm run stop:docker 
+```
 
 Para interagir com a aplicação siga os passos descritos na seção *como usar* do ambiente local.
 
@@ -129,4 +153,8 @@ Swagger: http://localhost:8010/api
 
 # Documentação técnica
 
-Rode o comando ```bash npm run docs ``` e consulte o diretório ./documentation 
+Rode o comando
+```bash 
+npm run docs 
+``` 
+Consulte o diretório ./documentation 
