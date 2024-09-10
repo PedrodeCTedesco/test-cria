@@ -38,8 +38,8 @@ export class UsersController {
       const user: User = await this.usersService.findOneByUsername(
         createUserDto.username,
       );
-
-      if(user) {
+  
+      if (user) {
         throw new ConflictException({
           type: process.env.API_DOCUMENTATION,
           title: 'User Already Exists',
@@ -48,14 +48,16 @@ export class UsersController {
           instance: '/users',
         });
       }
-
-      if (!user) return await this.usersService.create(createUserDto);
-
+  
+      if (!user) {
+        return await this.usersService.create(createUserDto);
+      }
     } catch (error) {
       this.logger.error(
         'An unexpected error occurred during user creation:',
         error,
       );
+      
       if (error instanceof BadRequestException) {
         throw new BadRequestException({
           type: process.env.API_DOCUMENTATION,
@@ -64,7 +66,9 @@ export class UsersController {
           detail: 'Data format must be a valid JSON. Check the if the properties username or password are present in a valid format',
           instance: '/users',
         });
-      } else (error instanceof InternalServerErrorException) 
+      } else if (error instanceof ConflictException) {
+        throw error; // Re-lança a ConflictException sem modificá-la
+      } else if (error instanceof InternalServerErrorException) {
         throw new InternalServerErrorException({
           type: process.env.API_DOCUMENTATION,
           title: 'Unexpected Internal Server Error',
@@ -72,8 +76,19 @@ export class UsersController {
           detail: 'An unexpected error occurred during user creation',
           instance: '/users',
         });
+      } else {
+        // Para qualquer outro tipo de erro
+        throw new InternalServerErrorException({
+          type: process.env.API_DOCUMENTATION,
+          title: 'Internal Server Error',
+          status: 500,
+          detail: 'An unexpected error occurred during user creation',
+          instance: '/users',
+        });
+      }
     }
   }
+  
 
   @Get()
   async findAll(): Promise<User[]> {

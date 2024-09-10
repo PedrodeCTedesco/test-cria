@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { ConflictException, INestApplication, Logger } from '@nestjs/common';
+import { ConflictException, INestApplication, InternalServerErrorException, Logger } from '@nestjs/common';
 import * as request from 'supertest';
 import { AppModule } from '../app.module';
 import { UsersService } from './users.service';
@@ -62,11 +62,16 @@ describe('users controller', () => {
           }
           return null;
         }),
-        update: jest.fn().mockImplementation((id, dto) => ({
-          id,
-          ...dto,
-          updatedAt: new Date(),
-        })),
+        update: jest.fn().mockImplementation((id, dto) => {
+          if (id === 'error_id') {
+            throw new InternalServerErrorException('Unexpected error');
+          }
+          return {
+            id,
+            ...dto,
+            updatedAt: new Date(),
+          };
+        }),
         remove: jest.fn().mockResolvedValue({ deleted: true }),
       })
       .compile();
@@ -171,7 +176,7 @@ describe('users controller', () => {
         .set('Authorization', `Bearer ${testToken}`)
         .send(createUserDto);
       // Assert
-      expect(result.statusCode).toBe(500);
+      expect(result.statusCode).toBe(409);
       expect(result.body.detail).toEqual(
         `A user with the username ${createUserDto.username} already exists.`,
       );
@@ -356,35 +361,31 @@ describe('users controller', () => {
       expect(result.body.instance).toBe('/users/:id');
     });
 
-    it("should return 400 if a bad request is made", async () => {
-      // Arrange
-      const teste = "oi"
-      // Assert
-      expect(test).toBe(404)
-    });
-
     it('should return 500 if an unexpected error occurs', async () => {
       // Arrange
-      const id: string = 'valid_id';
-      jest
-        .spyOn(service, 'update')
-        .mockRejectedValue(new Error('Database error'));
-      jest.spyOn(logger, 'error').mockImplementation(() => {});
+      const errorUpdate: SimpleUser = {
+        id: 'error_id',
+        username: "user",
+        password: "pass"
+      }
+    
+      jest.spyOn(service, 'update').mockRejectedValue(new InternalServerErrorException('Unexpected error during update'));
+    
       // Act
       const result = await request(app.getHttpServer())
-        .patch(`/users/${id}`)
+        .patch(`/users/${errorUpdate.id}`)
         .set('Authorization', `Bearer ${testToken}`)
-        .send({});
+        .send(errorUpdate);
+    
       // Assert
       expect(result.statusCode).toBe(500);
       expect(result.body.type).toBe(process.env.API_DOCUMENTATION);
       expect(result.body.title).toBe('Unexpected Internal Server Error');
       expect(result.body.status).toBe(500);
-      expect(result.body.detail).toBe(
-        'An unexpected error occurred during user update',
-      );
+      expect(result.body.detail).toBe('An unexpected error occurred during user update');
       expect(result.body.instance).toBe('/users/:id');
     });
+    
   });
 
   describe('HTTP responses remove method', () => {
