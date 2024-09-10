@@ -5,7 +5,6 @@ import { UsersModule } from './users.module';
 import { UsersService } from './users.service';
 import mongoose from 'mongoose';
 import { User } from './schema/user.schema';
-import { CreateUserDto } from './dto/create-user.dto';
 import { SimpleUser } from 'src/types/user/user.type';
 
 describe('users service', () => {
@@ -30,7 +29,6 @@ describe('users service', () => {
       ],
     }).compile();
 
-    //controller = module.get<UsersController>(UsersController);
     service = module.get<UsersService>(UsersService);
     configService = module.get<ConfigService>(ConfigService);
   });
@@ -41,11 +39,26 @@ describe('users service', () => {
 
   describe('findAll method', () => {
     it('type of return must be an Array', async () => {
-      // Arrange, Act
+      // Arrange
+      const mockUsers: Partial<SimpleUser[]> = [{
+        id: 'mock_id_1',
+        username: 'test_user_1',
+        password: 'password123'
+      }, {
+        id: 'mock_id_2',
+        username: 'test_user_2',
+        password: 'password456'
+      }];
+    
+      jest.spyOn(service, 'findAll').mockResolvedValue(mockUsers as User[]);
+    
+      // Act
       const result: User[] = await service.findAll();
+    
       // Assert
       expect(result).toBeInstanceOf(Array);
     });
+    
 
     it('should return empty when there is no user in database', async () => {
       // Arrange
@@ -94,7 +107,7 @@ describe('users service', () => {
         username: 'username_2',
         password: 'username2@123',
       };
-      const id: number = parseInt(configService.get<string>('USER_ID'));
+      const id: string = configService.get<string>('USER_ID');
       jest.spyOn(service, 'findOne').mockResolvedValue(user as User);
       // Act
       const result: User = await service.findOne(id);
@@ -142,7 +155,7 @@ describe('users service', () => {
         username: 'novo_nome',
       };
 
-      const id: number = parseInt(configService.get<string>('USER_ID'));
+      const id: string = configService.get<string>('USER_ID');
 
       jest.spyOn(service, 'update').mockResolvedValue(updatedUser as User);
       // Act
