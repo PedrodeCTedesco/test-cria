@@ -46,44 +46,6 @@ npm run build
 npm run start:dev 
 ``` 
 
-
-## Como usar
-A aplicação possui um endpoint chamado '/users'. Para poder acessá-lo e realizar operações CRUD você precisa de um token de acesso. 
-Para gerar seu token de acesso siga os passos abaixo:
-
-1. Envie via Postman/Insomnia uma requisição POST para http://localhost:8010/auth/register cujo corpo é:
-
-```json
-{
-    "username": "[seu nome de usuário]",
-    "password": "[sua senha]"
-}
-```
-
-Você terá como retorno o seu token de acesso:
-
-```json
-{
-    "acess_token": "[token]"
-}
-```
-
-2. Com seu token de acesso você poderá acessar as rotas GET, POST, DELETE e PATCH enviando o token no cabeçalho da requisição:
-```json
-Authorization: Bearer "[token]"
-```
-
-Para saber quais as rotas estão disponíveis verifique a documentação da API.
-
-3. Após o token expirar você pode obter um novo token através da rota: http://localhost:8010/auth/login utilizando no corpo da requisição as mesmas credenciais utilizadas no registro.
-
-```json
-{
-    "username": "[seu nome de usuário]",
-    "password": "[sua senha]"
-}
-```
-
 # Ambiente Docker
 
 Para rodar a aplicação em Docker.
@@ -146,7 +108,42 @@ Caso queira parar os contêineres utilize:
 npm run stop:docker 
 ```
 
-Para interagir com a aplicação siga os passos descritos na seção *como usar* do ambiente local.
+# Como usar
+A aplicação possui um endpoint chamado '/users'. Para poder acessá-lo e realizar operações CRUD você precisa de um token de acesso. 
+Para gerar seu token de acesso siga os passos abaixo:
+
+1. Envie via Postman/Insomnia uma requisição POST para http://localhost:8010/auth/register cujo corpo é:
+
+```json
+{
+    "username": "[seu nome de usuário]",
+    "password": "[sua senha]"
+}
+```
+
+Você terá como retorno o seu token de acesso:
+
+```json
+{
+    "acess_token": "[token]"
+}
+```
+
+2. Com seu token de acesso você poderá acessar as rotas GET, POST, DELETE e PATCH enviando o token no cabeçalho da requisição:
+```json
+Authorization: Bearer "[token]"
+```
+
+Para saber quais as rotas estão disponíveis verifique a documentação da API.
+
+3. Após o token expirar você pode obter um novo token através da rota: http://localhost:8010/auth/login utilizando no corpo da requisição as mesmas credenciais utilizadas no registro.
+
+```json
+{
+    "username": "[seu nome de usuário]",
+    "password": "[sua senha]"
+}
+```
 
 # Documentação da API
 Swagger: http://localhost:8010/api
