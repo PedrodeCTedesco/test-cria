@@ -70,7 +70,7 @@ Você terá como retorno o seu token de acesso:
 
 2. Com seu token de acesso você poderá acessar as rotas GET, POST, DELETE e PATCH enviando o token no cabeçalho da requisição:
 ```json
-'Authorization': 'Bearer "[token]"'
+Authorization: Bearer "[token]"
 ```
 
 Para saber quais as rotas estão disponíveis verifique a documentação da API.
