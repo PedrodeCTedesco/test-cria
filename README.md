@@ -1,8 +1,7 @@
-A aplicação consiste em um endpoint /users que permite operações CRUD. 
-As rotas são protegidas por JWT.
-Você pode rodar a aplicação em seu ambiente local ou gerar as imagens Docker e rodá-las em contêineres.
+A aplicação possui dois endpoints ('/users' e '/auth') que permitem operações CRUD mediante autenticação JWT.
+Você pode rodar a aplicação em seu ambiente local ou em contêineres.
 
-**Importante**: os arquivos de configuração como .env e Dockerfile estão presentes para fins de facilitar a execução da aplicação ao clonar o repositório.
+**Importante**: os arquivos de configuração como .env e Dockerfile e outros estão presentes para fins de facilitar a execução da aplicação ao clonar o repositório.
 
 Para realização de testes utilize o comando:
 ```bash
@@ -35,7 +34,7 @@ Para rodar a aplicação em ambiente local você deve se certificar que o Mongo 
 1. Clone o projeto do repositório do GitHub;
 2. Certifique-se que está na _branch_ **prod**;
 3. Inicie o Mongo Server;
-4. Instale as dependências com o comando ``` npm install ```
+4. Instale as dependências da aplicação com o comando ``` npm install ```
 5. _Scripts_ para rodar a aplicação:
 
 ```bash 
@@ -109,7 +108,7 @@ npm run stop:docker
 ```
 
 # Como usar
-A aplicação possui um endpoint chamado '/users'. Para poder acessá-lo e realizar operações CRUD você precisa de um token de acesso. 
+A aplicação possui um endpoint chamado '/users' que permite realização de operações CRUD e um endpoint '/auth' cujas rotas permitem operações de autenticação do usuário para interagir com a aplicação. Para realizar operações CRUD com o endpoint '/users' você precisa de um token de acesso. 
 Para gerar seu token de acesso siga os passos abaixo:
 
 1. Envie via Postman/Insomnia uma requisição POST para http://localhost:8010/auth/register cujo corpo é:
@@ -130,6 +129,7 @@ Você terá como retorno o seu token de acesso:
 ```
 
 2. Com seu token de acesso você poderá acessar as rotas GET, POST, DELETE e PATCH enviando o token no cabeçalho da requisição:
+
 ```json
 Authorization: Bearer "[token]"
 ```
