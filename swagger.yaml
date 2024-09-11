@@ -10,6 +10,54 @@ servers:
   - url: http://localhost:8010
     description: Servidor da aplicação
 paths:
+  /auth/login:
+    post:
+      summary: Realiza login do usuário
+      operationId: loginUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequestDto'
+      responses:
+        '200':
+          description: Login realizado com sucesso.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponseDTO'
+        '400':
+          description: Credenciais inválidas
+        '500':
+          description: Erro interno do servidor ao processar o login
+      tags:
+        - Autenticação
+      security: [] 
+  /auth/register:
+    post:
+      summary: Registra um novo usuário
+      operationId: registerUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: 
+              $ref: '#/components/schemas/RegisterRequestDto'
+      responses:
+        '201':
+          description: Usuário registrado com sucesso.
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RegisterResponseDTO'
+        '400':
+          description: Erro na validação das credenciais
+        '500':
+          description: Erro interno do servidor ao registrar o usuário
+      tags:
+        - Autenticação
+      security: [] 
   /users:
     post:
       summary: Registro de um novo usuário
@@ -189,6 +237,45 @@ components:
       required:
         - username
         - password
+    LoginRequestDto:
+      type: object
+      properties:
+        username:
+          type: string
+          example: "user123"
+        password:
+          type: string
+          example: "P@ssw0rd!"
+      required:
+        - username
+        - password
+    RegisterRequestDto:
+      type: object
+      properties:
+        username:
+          type: string
+          example: "newuser"
+        password:
+          type: string
+          example: "P@ssw0rd!"
+      required:
+        - username
+        - password
+    LoginResponseDTO:
+      type: object
+      properties:
+        accessToken:
+          type: string
+          example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+    RegisterResponseDTO:
+      type: object
+      properties:
+        id:
+          type: string
+          example: "123456"
+        username:
+          type: string
+          example: "newuser"
     User:
       type: object
       properties:
