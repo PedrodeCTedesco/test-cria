@@ -57,7 +57,7 @@ export class AuthService {
       user.username,
     );
     if (existingUser) {
-      throw new BadRequestException('email already exists');
+      throw new BadRequestException('username already exists');
     }
     const hashedPassword = await bcrypt.hash(user.password, 10);
     const newUser: SimpleUser = { ...user, password: hashedPassword };

@@ -10,8 +10,8 @@ import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
 import { AppModule } from '../app.module';
 import { UsersModule } from '../users/users.module';
-import { AccessToken } from 'src/types/auth/access.token';
-import { SimpleUser } from 'src/types/user/user.type';
+import { AccessToken } from '../types/auth/access.token';
+import { SimpleUser } from '../types/user/user.type';
 
 describe('AuthService', () => {
   let app: INestApplication;
@@ -59,6 +59,22 @@ describe('AuthService', () => {
     it('should be defined', () => {
       expect(controller).toBeDefined();
     });
+
+    it('should login with valid credentials', async () => {
+      // Arrange
+      const user: SimpleUser = {
+        username: "pedro",
+        password: "pedro@123"
+      }
+      const accessToken: AccessToken = {
+        access_token: "access"
+      }
+      jest.spyOn(service, 'login').mockResolvedValue(accessToken);
+      // Act
+      const result = await request(app.getHttpServer()).post('/auth/login').send(user);
+      // Assert
+      expect(result.statusCode).toBe(201);
+    });
   
     it('should throw 400 if username already exists', async () => {
       // Arrange
@@ -73,5 +89,38 @@ describe('AuthService', () => {
       expect(result.statusCode).toBe(400);
       expect(result.body.detail).toEqual('The username existingUser already exists');
     });
+
+    it("should throw 401 with invalid JSON", async () => {
+      // Arrange
+      const user: Partial<SimpleUser> = {
+        username: "pedro",
+      }
+      const accessToken: AccessToken = {
+        access_token: "access"
+      }
+      jest.spyOn(service, 'login').mockResolvedValue(accessToken);
+      // Act
+      const result = await request(app.getHttpServer()).post('/auth/login').send(user);
+      // Assert
+      expect(result.statusCode).toBe(401);
+    });
+  });
+
+  describe("register method", () => {
+    it("should return 201 when new user is registered", async () => {
+      // Arrange
+      const user: SimpleUser = {
+        username: "pedro",
+        password: "pedro@123"
+      };
+      const accessToken: AccessToken = {
+        access_token: "access"
+      }
+      jest.spyOn(service, 'register').mockResolvedValue(accessToken);
+      // Act
+      const result = await request(app.getHttpServer()).post('/auth/register').send(user);
+      // Assert
+      expect(result.statusCode).toBe(201);
+    })
   });
 });
